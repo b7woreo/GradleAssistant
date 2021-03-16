@@ -1,0 +1,28 @@
+on:
+  push:
+    tags:
+      - v*.*.*
+
+jobs:
+  pushlish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+          
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
+
+      - name: Publish
+        run: chmod +x ./gradlew && ./gradlew :plugin:publishMainPublicationToMavenRepository
+        env:
+          USERNAME: ${{secrets.USERNAME}}
+          TOKEN: ${{secrets.TOKEN}}
+          VERSION: ${{steps.get_version.outputs.VERSION}}
