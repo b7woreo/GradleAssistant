@@ -54,30 +54,17 @@ abstract class ReportConfigurationDependencies : DefaultTask() {
         verbose: Boolean
     ) {
         node(configuration.name) {
-            color = if (configuration.isCanBeResolved) {
-                if (configuration.isCanBeConsumed) 0xf44336
-                else 0x4caf50
-            } else {
-                if (configuration.isCanBeConsumed) 0x42a5f5
-                else 0x9e9e9e
-            }
+            val role = configuration.role
+            color = role.color
             shape = Shape.Box
-            if(verbose){
-                val role = if (configuration.isCanBeResolved) {
-                    if (configuration.isCanBeConsumed) "Bucket of dependencies"
-                    else "Resolve for certain usage"
-                } else {
-                    if (configuration.isCanBeConsumed) "Exposed to consumers"
-                    else "Legacy"
-                }
-
+            if (verbose) {
+                val description = role.description
                 val attributes = configuration.attributes.run {
                     keySet().joinToString(separator = "\n") { "${it.name}: ${getAttribute(it)}" }
                 }
-
                 label = """
                     ${configuration.name}
-                    [$role]
+                    [$description]
                     $attributes
                 """.trimIndent()
             }
@@ -89,4 +76,22 @@ abstract class ReportConfigurationDependencies : DefaultTask() {
         }
     }
 
+    private val Configuration.role: Role
+        get() = when (isCanBeConsumed) {
+            true -> when (isCanBeResolved) {
+                true -> Role.Legacy
+                false -> Role.Elements
+            }
+            false -> when (isCanBeResolved) {
+                true -> Role.Classpath
+                false -> Role.Dependencies
+            }
+        }
+
+    private enum class Role(val description: String, val color: Int) {
+        Dependencies("Bucket of dependencies", 0xf44336),
+        Elements("Exposed to consumers", 0x42a5f5),
+        Classpath("Resolve for certain usage", 0x4caf50),
+        Legacy("Legacy", 0x9e9e9e)
+    }
 }
