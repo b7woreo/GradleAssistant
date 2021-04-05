@@ -1,4 +1,5 @@
 # GDR（Gradle Dependencies Reportor）
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.chrnie.gdr/plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.chrnie.gdr/plugin)
 
 Gradle 图形化依赖关系导出工具，支持导出：
 1. 项目依赖关系图
