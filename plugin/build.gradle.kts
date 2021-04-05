@@ -4,14 +4,31 @@ plugins {
     id("maven-publish")
 }
 
+gradlePlugin {
+    val main by plugins.creating {
+        id = "com.chrnie.gdr"
+        implementationClass = "com.chrnie.gdr.GdrPlugin"
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.android.tools.build:gradle:3.4.0")
+}
+
 publishing {
     publications {
         repositories {
             maven {
-                url = uri("https://maven.pkg.github.com/renjie-c/gdr")
+                name = "ossrh"
+                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
-                    username = System.getenv("USERNAME")
-                    password = System.getenv("TOKEN")
+                    username = System.getenv("OSSRH_USERNAME")
+                    password = System.getenv("OSSRH_PASSWORD")
                 }
             }
         }
@@ -24,20 +41,4 @@ publishing {
             from(components["java"])
         }
     }
-}
-
-repositories {
-    google()
-    mavenCentral()
-}
-
-gradlePlugin {
-    val main by plugins.creating {
-        id = "com.chrnie.gdr"
-        implementationClass = "com.chrnie.gdr.GdrPlugin"
-    }
-}
-
-dependencies{
-    implementation("com.android.tools.build:gradle:3.4.0")
 }

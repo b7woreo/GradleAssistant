@@ -23,6 +23,6 @@ jobs:
       - name: Publish
         run: chmod +x ./gradlew && ./gradlew :plugin:publishMainPublicationToMavenRepository
         env:
-          USERNAME: ${{secrets.USERNAME}}
-          TOKEN: ${{secrets.TOKEN}}
           VERSION: ${{steps.get_version.outputs.VERSION}}
+          OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
+          OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
