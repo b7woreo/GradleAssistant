@@ -21,7 +21,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
 
       - name: Publish
-        run: chmod +x ./gradlew && ./gradlew :plugin:publishMainPublicationToMavenRepository
+        run: chmod +x ./gradlew && ./gradlew :plugin:publishMainPublicationToOssrhRepository
         env:
           VERSION: ${{steps.get_version.outputs.VERSION}}
           OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
