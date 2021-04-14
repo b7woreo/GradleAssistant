@@ -46,7 +46,7 @@ class GdrPlugin : Plugin<Project> {
             ReportTaskDependencies::class.java
         ) {
             it.group = TASK_GROUP
-            it.outputDir = project.buildDir.resolve("report/taskDependencies")
+            it.outputDir = project.buildDir.resolve("reports/taskDependencies")
             it.outputs.upToDateWhen { false }
         }
         
@@ -55,7 +55,7 @@ class GdrPlugin : Plugin<Project> {
             ReportConfigurationDependencies::class.java
         ){
             it.group = TASK_GROUP
-            it.outputDir = project.buildDir.resolve("report/configurationDependencies")
+            it.outputDir = project.buildDir.resolve("reports/configurationDependencies")
             it.outputs.upToDateWhen { false }
         }
     }
@@ -67,7 +67,7 @@ class GdrPlugin : Plugin<Project> {
                 it.group = TASK_GROUP
                 it.variantName = sourceSet.name
                 it.configurationName = sourceSet.runtimeClasspathConfigurationName
-                it.outputDir = project.buildDir.resolve("report/projectDependencies")
+                it.outputDir = project.buildDir.resolve("reports/projectDependencies")
                 it.outputs.upToDateWhen { false }
             }
         }
@@ -80,7 +80,7 @@ class GdrPlugin : Plugin<Project> {
                 it.group = TASK_GROUP
                 it.variantName = variant.name
                 it.configurationName = variant.runtimeConfiguration.name
-                it.outputDir = project.buildDir.resolve("report/projectDependencies")
+                it.outputDir = project.buildDir.resolve("reports/projectDependencies")
                 it.outputs.upToDateWhen { false }
             }
         }
