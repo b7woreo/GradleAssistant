@@ -16,9 +16,7 @@ Gradle 图形化依赖关系导出工具，支持导出：
     ``` groovy
     buildscript {
         repositories {
-            maven {
-                url = uri("https://maven.pkg.github.com/renjie-c/gdr")
-            }
+            mavenCentral()
         }
 
         dependencies {
@@ -43,7 +41,7 @@ Gradle 图形化依赖关系导出工具，支持导出：
 参数：  
 - type：指定要输出依赖的类型，可选值：all、project、external，默认值：all  
 
-输出路径：build/reportProjectDependencies  
+输出路径：build/reports/projectDependencies  
 
 ##### 示例
 ```
@@ -59,7 +57,7 @@ Gradle 图形化依赖关系导出工具，支持导出：
 - includeDependentProject：是否包含依赖项目的任务  
 - verbose：输出附加信息  
 
-输出路径：build/reportTaskDependencies  
+输出路径：build/reports/taskDependencies  
 
 ##### 示例
 ``` bash
@@ -74,7 +72,7 @@ Gradle 图形化依赖关系导出工具，支持导出：
 - configuration：指定要输出依赖关系的配置名，如果不设置则输出当前项目下所有配置的依赖关系  
 - verbose：输出附加信息  
 
-输出路径：build/reportConfigurationDependencies  
+输出路径：build/reports/configurationDependencies  
 
 ##### 示例
 ```
