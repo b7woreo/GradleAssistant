@@ -1,6 +1,6 @@
 plugins {
     id("java-gradle-plugin")
-    id("org.jetbrains.kotlin.jvm") version "1.4.30"
+    id("org.jetbrains.kotlin.jvm") version "1.7.0"
     id("maven-publish")
     id("signing")
 }
@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:3.4.0")
+    implementation("com.android.tools.build:gradle:4.0.2")
 }
 
 tasks.create("javadocJar", Jar::class.java) {
@@ -47,7 +47,7 @@ publishing {
         create<MavenPublication>("main") {
             groupId = "com.chrnie.gdr"
             artifactId = "plugin"
-            version = System.getenv("VERSION")?:"0.0.2"
+            version = System.getenv("VERSION")?:""
 
             from(components["java"])
             artifact(tasks["javadocJar"])
@@ -71,9 +71,9 @@ publishing {
                 
                 developers {
                     developer {
-                        id.set("chrnie")
+                        id.set("knownitwhy")
                         name.set("ChenRenJie")
-                        email.set("chrnie@foxmail.com")
+                        email.set("knownitwhy@gmail.com")
                     }
                 }
             }
