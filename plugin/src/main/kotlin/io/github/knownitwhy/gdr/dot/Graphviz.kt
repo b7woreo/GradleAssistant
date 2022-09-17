@@ -1,4 +1,4 @@
-package com.chrnie.gdr.dot
+package io.github.knownitwhy.gdr.dot
 
 import org.gradle.api.Project
 import java.io.ByteArrayInputStream

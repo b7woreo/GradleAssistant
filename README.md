@@ -1,5 +1,5 @@
 # GDR（Gradle Dependencies Reportor）
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.chrnie.gdr/plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.chrnie.gdr/plugin)
+[![](https://img.shields.io/gradle-plugin-portal/v/io.github.knownitwhy.gdr)](https://plugins.gradle.org/plugin/io.github.knownitwhy.gdr)
 
 Gradle 图形化依赖关系导出工具，支持导出：
 1. 项目依赖关系图
@@ -28,7 +28,7 @@ Gradle 图形化依赖关系导出工具，支持导出：
 2. 在需要导出依赖图的项目中应用插件：
     ``` groovy
     plugins {
-        id("com.chrnie.gdr")
+        id("io.github.knownitwhy.gdr")
     }
     ```
 

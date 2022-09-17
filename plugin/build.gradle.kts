@@ -1,14 +1,23 @@
 plugins {
-    id("java-gradle-plugin")
+    id("com.gradle.plugin-publish") version "1.0.0"
     id("org.jetbrains.kotlin.jvm") version "1.7.0"
-    id("maven-publish")
-    id("signing")
+}
+
+group = "io.github.knownitwhy"
+version = findProperty("gradle.publish.version") as String? ?: "snapshot"
+
+pluginBundle {
+    website = "https://github.com/knownitwhy/gdr"
+    vcsUrl = "https://github.com/knownitwhy/gdr.git"
+    tags = listOf("dependency","dependencies")
 }
 
 gradlePlugin {
-    val main by plugins.creating {
-        id = "com.chrnie.gdr"
-        implementationClass = "com.chrnie.gdr.GdrPlugin"
+    plugins.create("gdr") {
+        id = "io.github.knownitwhy.gdr"
+        implementationClass = "io.github.knownitwhy.gdr.GdrPlugin"
+        displayName = "Plugin for report dependencies of project, task, configuration"
+        description = "A plugin that helps you analyze dependencies of project, task, configuration"
     }
 }
 
@@ -19,69 +28,4 @@ repositories {
 
 dependencies {
     implementation("com.android.tools.build:gradle:4.0.2")
-}
-
-tasks.create("javadocJar", Jar::class.java) {
-    archiveClassifier.set("javadoc")
-    from("javadoc")
-}
-
-tasks.create("sourcesJar", Jar::class.java) {
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
-}
-
-publishing {
-    publications {
-        repositories {
-            maven {
-                name = "ossrh"
-                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = System.getenv("OSSRH_USERNAME")
-                    password = System.getenv("OSSRH_PASSWORD")
-                }
-            }
-        }
-
-        create<MavenPublication>("main") {
-            groupId = "com.chrnie.gdr"
-            artifactId = "plugin"
-            version = System.getenv("VERSION")?:""
-
-            from(components["java"])
-            artifact(tasks["javadocJar"])
-            artifact(tasks["sourcesJar"])
-            
-            pom { 
-                name.set("gdr")
-                description.set("Gradle 图形化依赖关系导出工具")
-                url.set("https://github.com/renjie-c/gdr")
-                
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                
-                scm {
-                    url.set("https://github.com/renjie-c/gdr")
-                }
-                
-                developers {
-                    developer {
-                        id.set("knownitwhy")
-                        name.set("ChenRenJie")
-                        email.set("knownitwhy@gmail.com")
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    useInMemoryPgpKeys(System.getenv("SIGNING_KEY"), System.getenv("SIGNING_PASSWORD"))
-    sign(publishing.publications["main"])
 }

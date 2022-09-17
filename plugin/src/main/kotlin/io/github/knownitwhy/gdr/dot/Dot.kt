@@ -1,4 +1,4 @@
-package com.chrnie.gdr.dot
+package io.github.knownitwhy.gdr.dot
 
 fun buildDot(block: DotScope.() -> Unit): String {
     val stmtList = mutableListOf<Stmt>()
@@ -66,7 +66,7 @@ enum class Shape(override val value: String) : Attribute {
     override val key: String = "shape"
 }
 
-class Label(override val value: String): Attribute{
+class Label(override val value: String): Attribute {
     
     override val key: String = "label"
 }

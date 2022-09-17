@@ -1,9 +1,9 @@
-package com.chrnie.gdr.task
+package io.github.knownitwhy.gdr.task
 
-import com.chrnie.gdr.dot.DotScope
-import com.chrnie.gdr.dot.Graphviz
-import com.chrnie.gdr.dot.Shape
-import com.chrnie.gdr.dot.buildDot
+import io.github.knownitwhy.gdr.dot.DotScope
+import io.github.knownitwhy.gdr.dot.Graphviz
+import io.github.knownitwhy.gdr.dot.Shape
+import io.github.knownitwhy.gdr.dot.buildDot
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier

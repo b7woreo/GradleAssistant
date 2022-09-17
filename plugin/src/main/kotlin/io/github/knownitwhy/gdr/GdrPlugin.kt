@@ -1,14 +1,14 @@
-package com.chrnie.gdr
+package io.github.knownitwhy.gdr
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariant
-import com.chrnie.gdr.ext.getTaskName
-import com.chrnie.gdr.task.ReportConfigurationDependencies
-import com.chrnie.gdr.task.ReportProjectDependencies
-import com.chrnie.gdr.task.ReportTaskDependencies
+import io.github.knownitwhy.gdr.ext.getTaskName
+import io.github.knownitwhy.gdr.task.ReportConfigurationDependencies
+import io.github.knownitwhy.gdr.task.ReportProjectDependencies
+import io.github.knownitwhy.gdr.task.ReportTaskDependencies
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -16,7 +16,7 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSetContainer
 
 class GdrPlugin : Plugin<Project> {
-    
+
     companion object{
         private const val TASK_GROUP = "help"
     }
@@ -49,7 +49,7 @@ class GdrPlugin : Plugin<Project> {
             it.outputDir = project.buildDir.resolve("reports/taskDependencies")
             it.outputs.upToDateWhen { false }
         }
-        
+
         project.tasks.create(
             "reportConfigurationDependencies" ,
             ReportConfigurationDependencies::class.java

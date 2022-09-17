@@ -1,4 +1,4 @@
-package com.chrnie.gdr.ext
+package io.github.knownitwhy.gdr.ext
 
 import com.android.build.gradle.api.BaseVariant
 import java.util.*
