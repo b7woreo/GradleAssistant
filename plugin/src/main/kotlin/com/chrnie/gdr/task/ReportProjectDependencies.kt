@@ -18,16 +18,17 @@ import java.io.File
 
 abstract class ReportProjectDependencies : DefaultTask() {
     
-    @Input
+    @get:Input
     lateinit var variantName: String
 
-    @Input
+    @get:Input
     lateinit var configurationName: String
 
+    @get:Input
     @Option(option = "type", description = "指定要输出依赖的类型，可选值：all、project、external，默认值：all")
     var typeName: String = Type.All.value
 
-    @OutputDirectory
+    @get:OutputDirectory
     lateinit var outputDir: File
 
     @get:OutputFile

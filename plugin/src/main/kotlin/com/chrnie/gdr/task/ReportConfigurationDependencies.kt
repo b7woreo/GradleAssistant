@@ -6,6 +6,7 @@ import com.chrnie.gdr.dot.Shape
 import com.chrnie.gdr.dot.buildDot
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -14,16 +15,18 @@ import java.io.File
 
 abstract class ReportConfigurationDependencies : DefaultTask() {
 
+    @get:Input
     @Option(
         option = "configuration",
         description = "指定要输出依赖关系的配置名，如果不设置则输出当前项目下所有配置的依赖关系"
     )
     var configurationName: String? = null
 
+    @get:Input
     @Option(option = "verbose", description = "输出附加信息")
     var verbose: Boolean = false
 
-    @OutputDirectory
+    @get:OutputDirectory
     lateinit var outputDir: File
 
     @get:OutputFile
