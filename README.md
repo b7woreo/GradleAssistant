@@ -12,25 +12,13 @@ Gradle 图形化依赖关系导出工具，支持导出：
 本项目依赖 [graphviz](https://graphviz.org/) 生成依赖图，需要先下载安装该软件并将软件安装目录配置为 `GRAPHVIZ_HOME` 环境变量。
 
 ### 引入依赖
-1. 根项目下的 build.gradle 文件中添加 repositories 和 classpath 依赖：
-    ``` groovy
-    buildscript {
-        repositories {
-            mavenCentral()
-        }
 
-        dependencies {
-            classpath "com.chrnie.gdr:plugin:{version}"
-        }
-    }
-    ```
-
-2. 在需要导出依赖图的项目中应用插件：
-    ``` groovy
-    plugins {
-        id("io.github.knownitwhy.gdr")
-    }
-    ```
+在需要导出依赖图的项目中应用插件：
+ ``` groovy
+plugins {
+  id "io.github.knownitwhy.gdr" version "$version"
+}
+ ```
 
 ### 执行任务
 
