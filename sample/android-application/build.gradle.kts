@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("com.chrnie.gdr")
+    id("io.github.knownitwhy.gdr")
 }
 
 android {

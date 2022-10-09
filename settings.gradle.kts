@@ -4,6 +4,6 @@ include(":sample:java-library")
 
 includeBuild("plugin") {
     dependencySubstitution {
-        substitute(module("com.chrnie.gdr:plugin")).with(project(":"))
+        substitute(module("io.github.knownitwhy:plugin")).using(project(":"))
     }
 }
