@@ -1,4 +1,4 @@
-package io.github.knownitwhy.gdr.dot
+package gradle.assistant.dot
 
 fun buildDot(block: DotScope.() -> Unit): String {
     val stmtList = mutableListOf<Stmt>()

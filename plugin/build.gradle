@@ -1,0 +1,25 @@
+plugins {
+    id("com.gradle.plugin-publish") version "1.1.0"
+    id("org.jetbrains.kotlin.jvm") version "1.8.21"
+}
+
+gradlePlugin {
+    website = "https://github.com/knownitwhy/gdr"
+    vcsUrl = "https://github.com/knownitwhy/gdr.git"
+
+    plugins{
+        gdr {
+            id = "gradle.assistant"
+            implementationClass = "io.github.knownitwhy.gdr.GdrPlugin"
+        }
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("com.android.tools.build:gradle-api:8.0.1")
+}

@@ -1,0 +1,18 @@
+plugins {
+    id("com.android.library")
+}
+
+android {
+    namespace 'com.example.android-library'
+    compileSdkVersion 33
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+    }
+}
+
+dependencies{
+    implementation project(":example:java-library")
+}

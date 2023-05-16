@@ -1,9 +1,9 @@
-package io.github.knownitwhy.gdr.task
+package gradle.assistant.task
 
-import io.github.knownitwhy.gdr.dot.DotScope
-import io.github.knownitwhy.gdr.dot.Graphviz
-import io.github.knownitwhy.gdr.dot.Shape
-import io.github.knownitwhy.gdr.dot.buildDot
+import gradle.assistant.dot.DotScope
+import gradle.assistant.dot.Graphviz
+import gradle.assistant.dot.Shape
+import gradle.assistant.dot.buildDot
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier

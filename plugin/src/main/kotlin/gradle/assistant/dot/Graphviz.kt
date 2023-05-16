@@ -1,4 +1,4 @@
-package io.github.knownitwhy.gdr.dot
+package gradle.assistant.dot
 
 import org.gradle.api.Project
 import java.io.ByteArrayInputStream
