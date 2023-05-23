@@ -1,83 +1,66 @@
 package gradle.assistant.task
 
-import gradle.assistant.dot.DotScope
-import gradle.assistant.dot.Graphviz
-import gradle.assistant.dot.Shape
-import gradle.assistant.dot.buildDot
+import gradle.assistant.graphic.Graphic
+import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.options.Option
 import java.io.File
 
 abstract class ReportConfigurationDependencies : DefaultTask() {
-
-    @get:Input
-    @Option(
-        option = "configuration",
-        description = "指定要输出依赖关系的配置名，如果不设置则输出当前项目下所有配置的依赖关系"
-    )
-    var configurationName: String? = null
-
-    @get:Input
-    @Option(option = "verbose", description = "输出附加信息")
-    var verbose: Boolean = false
 
     @get:OutputDirectory
     lateinit var outputDir: File
 
     @get:OutputFile
     val outputFile: File
-        get() = outputDir.resolve("${configurationName ?: "dependencies"}.png")
+        get() = outputDir.resolve("dependencies.html")
 
     @TaskAction
     fun report() {
-        val dot = buildDot {
-            val configurationName = configurationName
-            if (configurationName == null) {
-                project.configurations.forEach { configuration ->
-                    buildGraph(configuration, verbose)
-                }
-            } else {
-                val targetConfiguration =
-                    checkNotNull(project.configurations.findByName(configurationName)) {
-                        "Can not found configuration: $configurationName"
-                    }
-                buildGraph(targetConfiguration, verbose)
+        val graphic = MermaidGraphic()
+        graphic.render(outputFile) {
+            project.configurations.forEach { configuration ->
+                buildGraph(configuration)
             }
         }
-        Graphviz.render(project, dot, outputFile)
     }
 
-    private fun DotScope.buildGraph(
+    private fun Graphic.Builder.buildGraph(
         configuration: Configuration,
-        verbose: Boolean
     ) {
-        node(configuration.name) {
-            val role = configuration.role
-            color = role.color
-            shape = Shape.Box
-            if (verbose) {
-                val description = role.description
-                val attributes = configuration.attributes.run {
-                    keySet().joinToString(separator = "\n") { "${it.name}: ${getAttribute(it)}" }
-                }
-                label = """
-                    ${configuration.name}
-                    [$description]
-                    $attributes
-                """.trimIndent()
-            }
-        }
-
+        node(configuration.content, configuration.shape)
         configuration.extendsFrom.forEach {
-            edge(configuration.name, it.name)
-            buildGraph(it, verbose)
+            buildGraph(it)
+            edge(configuration.content, it.content)
         }
     }
+
+    private val Configuration.content: String
+        get() {
+            return """
+            <b>$name</b>
+            <em>${role.description}</em>
+            ${
+                attributes.keySet()
+                    .map {attr -> "${attr.name}:${attributes.getAttribute(attr)}" }
+                    .sorted()
+                    .joinToString("\n")
+            }
+            """.trimIndent()
+        }
+
+    private val Configuration.shape: Graphic.Shape
+        get() {
+            return when (this.role) {
+                Role.Dependencies -> Graphic.Shape.Box
+                Role.Elements -> Graphic.Shape.Oval
+                Role.Classpath -> Graphic.Shape.Diamond
+                Role.Legacy -> Graphic.Shape.Box
+            }
+        }
 
     private val Configuration.role: Role
         get() = when (isCanBeConsumed) {
@@ -85,16 +68,17 @@ abstract class ReportConfigurationDependencies : DefaultTask() {
                 true -> Role.Legacy
                 false -> Role.Elements
             }
+
             false -> when (isCanBeResolved) {
                 true -> Role.Classpath
                 false -> Role.Dependencies
             }
         }
 
-    private enum class Role(val description: String, val color: Int) {
-        Dependencies("Bucket of dependencies", 0xf44336),
-        Elements("Exposed to consumers", 0x42a5f5),
-        Classpath("Resolve for certain usage", 0x4caf50),
-        Legacy("Legacy", 0x9e9e9e)
+    private enum class Role(val description: String) {
+        Dependencies("Bucket of dependencies"),
+        Elements("Exposed to consumers"),
+        Classpath("Resolve for certain usage"),
+        Legacy("Legacy")
     }
 }

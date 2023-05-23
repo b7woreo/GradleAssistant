@@ -1,9 +1,7 @@
 package gradle.assistant.task
 
-import gradle.assistant.dot.DotScope
-import gradle.assistant.dot.Graphviz
-import gradle.assistant.dot.Shape
-import gradle.assistant.dot.buildDot
+import gradle.assistant.graphic.Graphic
+import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
@@ -17,7 +15,7 @@ import org.gradle.api.tasks.options.Option
 import java.io.File
 
 abstract class ReportProjectDependencies : DefaultTask() {
-    
+
     @get:Input
     lateinit var variantName: String
 
@@ -25,7 +23,10 @@ abstract class ReportProjectDependencies : DefaultTask() {
     lateinit var configurationName: String
 
     @get:Input
-    @Option(option = "type", description = "指定要输出依赖的类型，可选值：all、project、external，默认值：all")
+    @Option(
+        option = "type",
+        description = "指定要输出依赖的类型，可选值：all、project、external，默认值：all"
+    )
     var typeName: String = Type.All.value
 
     @get:OutputDirectory
@@ -33,7 +34,7 @@ abstract class ReportProjectDependencies : DefaultTask() {
 
     @get:OutputFile
     val outputFile: File
-        get() = outputDir.resolve("${variantName}.png")
+        get() = outputDir.resolve("${variantName}.html")
 
     @TaskAction
     fun report() {
@@ -42,21 +43,18 @@ abstract class ReportProjectDependencies : DefaultTask() {
         }
         val type = checkNotNull(Type.find(typeName)) { "Please set correct args: --type" }
 
-        val dot = buildDot { buildGraph(configuration.incoming.resolutionResult.root, type) }
-        Graphviz.render(project, dot, outputFile)
+        val graphic = MermaidGraphic()
+        graphic.render(outputFile) {
+            val root = configuration.incoming.resolutionResult.root
+            buildGraph(root, type)
+        }
     }
 
-    private fun DotScope.buildGraph(
+    private fun Graphic.Builder.buildGraph(
         root: ResolvedComponentResult,
         filter: (ResolvedComponentResult) -> Boolean
     ) {
-        node(root.id.displayName) {
-            shape = when (root.id) {
-                is ProjectComponentIdentifier -> Shape.Oval
-                is ModuleComponentIdentifier -> Shape.Box
-                else -> throw IllegalStateException("Unknown component type: ${root.id::class}")
-            }
-        }
+        node(root.content, root.shape)
 
         root.dependencies
             .mapNotNull {
@@ -65,10 +63,26 @@ abstract class ReportProjectDependencies : DefaultTask() {
             }
             .filter { filter(it) }
             .forEach {
-                edge(root.id.displayName, it.id.displayName)
                 buildGraph(it, filter)
+                edge(root.content, it.content)
             }
     }
+
+    private val ResolvedComponentResult.content: String
+        get() {
+            return when (val id = this.id) {
+                is ProjectComponentIdentifier -> id.projectPath
+                else -> id.displayName
+            }
+        }
+
+    private val ResolvedComponentResult.shape: Graphic.Shape
+        get() {
+            return when (this.id) {
+                is ProjectComponentIdentifier -> Graphic.Shape.Box
+                else -> Graphic.Shape.Oval
+            }
+        }
 
     enum class Type(val value: String) : (ResolvedComponentResult) -> Boolean {
         All("all") {

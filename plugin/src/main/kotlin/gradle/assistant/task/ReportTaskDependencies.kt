@@ -1,9 +1,7 @@
 package gradle.assistant.task
 
-import gradle.assistant.dot.DotScope
-import gradle.assistant.dot.Graphviz
-import gradle.assistant.dot.Shape
-import gradle.assistant.dot.buildDot
+import gradle.assistant.graphic.Graphic
+import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.tasks.Input
@@ -16,7 +14,10 @@ import java.io.File
 abstract class ReportTaskDependencies : DefaultTask() {
 
     @get:Input
-    @Option(option = "task", description = "指定要输出依赖关系的任务名，如果不设置则输出当前项目下所有任务的依赖关系")
+    @Option(
+        option = "task",
+        description = "指定要输出依赖关系的任务名，如果不设置则输出当前项目下所有任务的依赖关系"
+    )
     var taskName: String? = null
 
     @get:Input
@@ -32,7 +33,7 @@ abstract class ReportTaskDependencies : DefaultTask() {
 
     @get:OutputFile
     val outputFile: File
-        get() = outputDir.resolve("${taskName ?: "dependencies"}.png")
+        get() = outputDir.resolve("${taskName ?: "dependencies"}.html")
 
     @TaskAction
     fun report() {
@@ -41,7 +42,8 @@ abstract class ReportTaskDependencies : DefaultTask() {
             else it.project == project
         }
 
-        val dot = buildDot {
+        val graphic = MermaidGraphic()
+        graphic.render(outputFile) {
             val taskName = taskName
             if (taskName == null) {
                 project.tasks.forEach { task ->
@@ -54,24 +56,30 @@ abstract class ReportTaskDependencies : DefaultTask() {
                 buildGraph(targetTask, verbose, filter)
             }
         }
-        Graphviz.render(project, dot, outputFile)
     }
 
-    private fun DotScope.buildGraph(targetTask: Task, verbose: Boolean, filter: (Task) -> Boolean) {
-        node(targetTask.path) {
-            shape = if (targetTask.project == project) Shape.Oval else Shape.Box
-            if (verbose) {
-                label = "${targetTask.path}\n[${targetTask::class.java.superclass.name}]"
-            }
-        }
+    private fun Graphic.Builder.buildGraph(
+        targetTask: Task,
+        verbose: Boolean,
+        filter: (Task) -> Boolean
+    ) {
+        node(targetTask.content, Graphic.Shape.Box)
 
         targetTask.taskDependencies
             .getDependencies(targetTask)
             .filter { filter(it) }
             .forEach {
-                edge(targetTask.path, it.path)
                 buildGraph(it, verbose, filter)
+                edge(targetTask.content, it.content)
             }
     }
+
+    private val Task.content: String
+        get() {
+            return """
+            <b>${name}</b>
+            ${this::class.java.superclass.name}
+            """.trimIndent()
+        }
 
 }

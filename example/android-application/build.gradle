@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id('gradle.assistant')
 }
 
 android {
@@ -15,4 +16,6 @@ android {
 
 dependencies {
     implementation project(":example:android-library")
+    implementation project(":example:java-library")
+    implementation libs.rxjava
 }

@@ -10,7 +10,7 @@ gradlePlugin {
     plugins{
         gdr {
             id = "gradle.assistant"
-            implementationClass = "io.github.knownitwhy.gdr.GdrPlugin"
+            implementationClass = "gradle.assistant.GradleAssistant"
         }
     }
 }

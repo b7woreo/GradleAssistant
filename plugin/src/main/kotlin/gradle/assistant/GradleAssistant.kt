@@ -12,10 +12,10 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.configurationcache.extensions.capitalized
 
-class GradleAssistant : Plugin<Project> {
+abstract class GradleAssistant : Plugin<Project> {
 
     companion object {
-        private const val TASK_GROUP = "GradleAssistant"
+        private const val TASK_GROUP = "assistant"
     }
 
     override fun apply(project: Project) {

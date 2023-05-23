@@ -15,4 +15,5 @@ android {
 
 dependencies{
     implementation project(":example:java-library")
+    implementation libs.rxjava
 }
