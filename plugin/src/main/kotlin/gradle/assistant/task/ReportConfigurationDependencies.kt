@@ -4,22 +4,18 @@ import gradle.assistant.graphic.Graphic
 import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 abstract class ReportConfigurationDependencies : DefaultTask() {
 
     @get:OutputDirectory
-    lateinit var outputDir: File
-
-    @get:OutputFile
-    val outputFile: File
-        get() = outputDir.resolve("dependencies.html")
+    abstract val outputDir: DirectoryProperty
 
     @TaskAction
     fun report() {
+        val outputFile = outputDir.file("dependencies.html").get().asFile
         val graphic = MermaidGraphic()
         graphic.render(outputFile) {
             project.configurations.forEach { configuration ->
@@ -45,7 +41,7 @@ abstract class ReportConfigurationDependencies : DefaultTask() {
             <em>${role.description}</em>
             ${
                 attributes.keySet()
-                    .map {attr -> "${attr.name}:${attributes.getAttribute(attr)}" }
+                    .map { attr -> "${attr.name}:${attributes.getAttribute(attr)}" }
                     .sorted()
                     .joinToString("\n")
             }

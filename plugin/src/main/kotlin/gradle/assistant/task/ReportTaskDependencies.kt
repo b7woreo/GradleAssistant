@@ -4,72 +4,61 @@ import gradle.assistant.graphic.Graphic
 import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import java.io.File
 
 abstract class ReportTaskDependencies : DefaultTask() {
 
     @get:Input
-    @Option(
-        option = "task",
-        description = "指定要输出依赖关系的任务名，如果不设置则输出当前项目下所有任务的依赖关系"
-    )
-    var taskName: String? = null
-
-    @get:Input
-    @Option(option = "includeDependentProject", description = "是否包含依赖项目的任务")
-    var includeDependentProject: Boolean = false
-
-    @get:Input
-    @Option(option = "verbose", description = "输出附加信息")
-    var verbose: Boolean = false
+    @get:Optional
+    abstract val taskName: Property<String>
 
     @get:OutputDirectory
-    lateinit var outputDir: File
+    abstract val outputDir: DirectoryProperty
 
-    @get:OutputFile
-    val outputFile: File
-        get() = outputDir.resolve("${taskName ?: "dependencies"}.html")
+    @Option(
+        option = "task",
+        description = "指定要输出依赖关系的任务名，如果不设置则输出当前项目下所有任务的依赖关系",
+    )
+    fun taskName(value: String) {
+        taskName.set(value)
+    }
 
     @TaskAction
     fun report() {
-        val filter: (Task) -> Boolean = {
-            if (includeDependentProject) true
-            else it.project == project
-        }
+        val taskName = this.taskName.orNull
+        val outputFile = this.outputDir.file("${taskName ?: "dependencies"}.html").get().asFile
 
         val graphic = MermaidGraphic()
         graphic.render(outputFile) {
-            val taskName = taskName
             if (taskName == null) {
                 project.tasks.forEach { task ->
-                    buildGraph(task, verbose, filter)
+                    buildGraph(task)
                 }
             } else {
                 val targetTask = checkNotNull(project.tasks.findByName(taskName)) {
-                    "Can not found task: ${this@ReportTaskDependencies.taskName}"
+                    "can not found task: ${this@ReportTaskDependencies.taskName}"
                 }
-                buildGraph(targetTask, verbose, filter)
+                buildGraph(targetTask)
             }
         }
     }
 
     private fun Graphic.Builder.buildGraph(
         targetTask: Task,
-        verbose: Boolean,
-        filter: (Task) -> Boolean
     ) {
         node(targetTask.content, Graphic.Shape.Box)
 
         targetTask.taskDependencies
             .getDependencies(targetTask)
-            .filter { filter(it) }
+            .filter { it.project == project }
             .forEach {
-                buildGraph(it, verbose, filter)
+                buildGraph(it)
                 edge(targetTask.content, it.content)
             }
     }

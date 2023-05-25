@@ -7,41 +7,48 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedComponentResult
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import java.io.File
 
 abstract class ReportProjectDependencies : DefaultTask() {
 
     @get:Input
-    lateinit var variantName: String
+    abstract val variantName: Property<String>
 
     @get:Input
-    lateinit var configurationName: String
+    abstract val configurationName: Property<String>
 
     @get:Input
+    @get:Optional
+    abstract val type: Property<Type>
+
     @Option(
         option = "type",
         description = "指定要输出依赖的类型，可选值：all、project、external，默认值：all"
     )
-    var typeName: String = Type.All.value
+    fun typeName(value: String) {
+        val type = checkNotNull(Type.find(value)) { "unknown type: $value" }
+        this.type.set(type)
+    }
 
     @get:OutputDirectory
-    lateinit var outputDir: File
-
-    @get:OutputFile
-    val outputFile: File
-        get() = outputDir.resolve("${variantName}.html")
+    abstract val outputDir: DirectoryProperty
 
     @TaskAction
     fun report() {
+        val variantName = variantName.get()
+        val configurationName = this.configurationName.get()
+        val type = this.type.getOrElse(Type.All)
+        val outputFile = this.outputDir.file("${variantName}.html").get().asFile
+
         val configuration = checkNotNull(project.configurations.findByName(configurationName)) {
             "Can not found configuration: $configurationName"
         }
-        val type = checkNotNull(Type.find(typeName)) { "Please set correct args: --type" }
 
         val graphic = MermaidGraphic()
         graphic.render(outputFile) {

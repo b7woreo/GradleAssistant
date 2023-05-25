@@ -43,7 +43,7 @@ abstract class GradleAssistant : Plugin<Project> {
             ReportTaskDependencies::class.java
         ) {
             it.group = TASK_GROUP
-            it.outputDir = project.buildDir.resolve("reports/taskDependencies")
+            it.outputDir.set(project.buildDir.resolve("reports/taskDependencies"))
             it.outputs.upToDateWhen { false }
         }
 
@@ -52,7 +52,7 @@ abstract class GradleAssistant : Plugin<Project> {
             ReportConfigurationDependencies::class.java
         ) {
             it.group = TASK_GROUP
-            it.outputDir = project.buildDir.resolve("reports/configurationDependencies")
+            it.outputDir.set(project.buildDir.resolve("reports/configurationDependencies"))
             it.outputs.upToDateWhen { false }
         }
     }
@@ -62,9 +62,9 @@ abstract class GradleAssistant : Plugin<Project> {
             val taskName = sourceSet.getTaskName("report", "projectDependencies")
             project.tasks.create(taskName, ReportProjectDependencies::class.java) {
                 it.group = TASK_GROUP
-                it.variantName = sourceSet.name
-                it.configurationName = sourceSet.runtimeClasspathConfigurationName
-                it.outputDir = project.buildDir.resolve("reports/projectDependencies")
+                it.variantName.set(sourceSet.name)
+                it.configurationName.set(sourceSet.runtimeClasspathConfigurationName)
+                it.outputDir.set(project.buildDir.resolve("reports/projectDependencies"))
                 it.outputs.upToDateWhen { false }
             }
         }
@@ -77,9 +77,9 @@ abstract class GradleAssistant : Plugin<Project> {
                 ReportProjectDependencies::class.java
             ) {
                 it.group = TASK_GROUP
-                it.variantName = variant.name
-                it.configurationName = variant.runtimeConfiguration.name
-                it.outputDir = project.buildDir.resolve("reports/projectDependencies")
+                it.variantName.set(variant.name)
+                it.configurationName.set(variant.runtimeConfiguration.name)
+                it.outputDir.set(project.buildDir.resolve("reports/projectDependencies"))
                 it.outputs.upToDateWhen { false }
             }
         }
