@@ -1,72 +1,49 @@
 # GDR（Gradle Dependencies Reportor）
-[![](https://img.shields.io/gradle-plugin-portal/v/io.github.knownitwhy.gdr)](https://plugins.gradle.org/plugin/io.github.knownitwhy.gdr)
+[![](https://img.shields.io/gradle-plugin-portal/v/io.github.b7woreo.gradle-assistant)](https://plugins.gradle.org/plugin/io.github.b7woreo.gradle-assistant)
 
-Gradle 图形化依赖关系导出工具，支持导出：
-1. 项目依赖关系图
-2. 任务依赖关系图
-3. 配置依赖关系图
+Gradle 工程依赖关系可视化工具，支持输出: 
+
+- Project 依赖关系图 
+- Task 依赖关系图 
+- Configuration 依赖关系图
 
 ## 用法
 
-### 前置条件
-本项目依赖 [graphviz](https://graphviz.org/) 生成依赖图，需要先下载安装该软件并将软件安装目录配置为 `GRAPHVIZ_HOME` 环境变量。
-
 ### 引入依赖
 
-在需要导出依赖图的项目中应用插件：
+在需要导出依赖图的项目中应用插件: 
  ``` groovy
 plugins {
-  id "io.github.knownitwhy.gdr" version "$version"
+  id "io.github.b7woreo.gradle-assistant" version "$version"
 }
  ```
 
 ### 执行任务
 
-#### 导出项目依赖图
+#### 输出 Project 依赖图
 
-目前仅支持 android、java 类型项目使用。  
-任务名：report{variant_name}ProjectDependencies  
-参数：  
-- type：指定要输出依赖的类型，可选值：all、project、external，默认值：all  
+任务名: projectDependencies  
+参数:   
+- variant: 指定变种名, 默认值: ""
+- type: 指定依赖类型，可选值: all、project、external，默认值: all  
 
-输出路径：build/reports/projectDependencies  
+输出路径: build/reports/projectDependencies.html
 
-##### 示例
-```
-./gradlew :sample:android-application:reportReleaseProjectDependencies
-```
-![项目依赖图](assets/projectDependencies.png)
+#### 输出 Task 依赖图
 
-#### 导出任务依赖图
+任务名: taskDependencies  
+参数:   
+- task: 指定任务名，默认输出所有任务的依赖关系  
 
-任务名：reportTaskDependencies  
-参数：  
-- task：指定要输出依赖关系的任务名，如果不设置则输出当前项目下所有任务的依赖关系  
-- includeDependentProject：是否包含依赖项目的任务  
-- verbose：输出附加信息  
+输出路径: build/reports/taskDependencies.html
 
-输出路径：build/reports/taskDependencies  
+#### 输出 Configuration 依赖图
 
-##### 示例
-``` bash
-./gradlew :sample:android-application:reportTaskDependencies --task="assembleDebug" --verbose
-```
-![任务依赖图](assets/taskDependencies.png)
+任务名: configurationDependencies  
+参数:   
+- configuration: 指定配置名，默认输出所有配置的依赖关系
 
-#### 导出配置依赖图
-
-任务名：reportConfigurationDependencies  
-参数：  
-- configuration：指定要输出依赖关系的配置名，如果不设置则输出当前项目下所有配置的依赖关系  
-- verbose：输出附加信息  
-
-输出路径：build/reports/configurationDependencies  
-
-##### 示例
-```
-./gradlew :sample:android-application:reportConfigurationDependencies --configuration="releaseRuntimeClasspath" --verbose
-```
-![配置依赖图](assets/configurationDependencies.png)
+输出路径: build/reports/configurationDependencies.html
 
 # 许可证
     Copyright 2021 ChenRenJie
