@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id('gradle.assistant')
+    id('io.github.b7woreo.gradle-assistant')
 }
 
 android {

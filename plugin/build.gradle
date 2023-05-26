@@ -3,14 +3,20 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.8.21"
 }
 
-gradlePlugin {
-    website = "https://github.com/knownitwhy/gdr"
-    vcsUrl = "https://github.com/knownitwhy/gdr.git"
+group = "io.github.b7woreo"
+version = findProperty("gradle.publish.version") ?: "snapshot"
 
-    plugins{
-        gdr {
-            id = "gradle.assistant"
+gradlePlugin {
+    website = "https://github.com/b7woreo/GradleAssistant"
+    vcsUrl = "https://github.com/b7woreo/GradleAssistant"
+
+    plugins {
+        gradleAssistant {
+            id = "io.github.b7woreo.gradle-assistant"
             implementationClass = "gradle.assistant.GradleAssistant"
+            displayName = "Gradle Assistant"
+            description = "A plugin that helps you analyze dependencies of project, task, configuration"
+            tags.set(["dependency", "dependencies"])
         }
     }
 }
