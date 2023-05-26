@@ -4,21 +4,45 @@ import gradle.assistant.graphic.Graphic
 import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.options.Option
 
-abstract class ReportConfigurationDependencies : DefaultTask() {
+abstract class ConfigurationDependencies : DefaultTask() {
 
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
+    @get:Input
+    @get:Optional
+    abstract val configurationName: Property<String>
+
+    @get:OutputFile
+    abstract val dependenciesInfoFile: RegularFileProperty
+
+    @Option(
+        option = "configuration",
+        description = "configuration name，output all configuration dependencies by default"
+    )
+    fun configurationName(value: String) {
+        configurationName.set(value)
+    }
 
     @TaskAction
     fun report() {
-        val outputFile = outputDir.file("dependencies.html").get().asFile
+        val configurationName = this.configurationName.orNull
+        val outputFile = dependenciesInfoFile.asFile.get()
+
         val graphic = MermaidGraphic()
         graphic.render(outputFile) {
-            project.configurations.forEach { configuration ->
+            if (configurationName == null) {
+                project.configurations.forEach { configuration ->
+                    buildGraph(configuration)
+                }
+            } else {
+                val configuration = project.configurations.findByName(configurationName)
+                checkNotNull(configuration) { "can not found configuration: $configurationName" }
                 buildGraph(configuration)
             }
         }

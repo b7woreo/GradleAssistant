@@ -5,25 +5,27 @@ import gradle.assistant.graphic.MermaidGraphic
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
-abstract class ReportTaskDependencies : DefaultTask() {
+abstract class TaskDependencies : DefaultTask() {
 
     @get:Input
     @get:Optional
     abstract val taskName: Property<String>
 
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
+    @get:OutputFile
+    abstract val dependenciesInfoFile: RegularFileProperty
 
     @Option(
         option = "task",
-        description = "指定要输出依赖关系的任务名，如果不设置则输出当前项目下所有任务的依赖关系",
+        description = "task name, output all task dependencies by default",
     )
     fun taskName(value: String) {
         taskName.set(value)
@@ -32,7 +34,7 @@ abstract class ReportTaskDependencies : DefaultTask() {
     @TaskAction
     fun report() {
         val taskName = this.taskName.orNull
-        val outputFile = this.outputDir.file("${taskName ?: "dependencies"}.html").get().asFile
+        val outputFile = dependenciesInfoFile.asFile.get()
 
         val graphic = MermaidGraphic()
         graphic.render(outputFile) {
@@ -42,7 +44,7 @@ abstract class ReportTaskDependencies : DefaultTask() {
                 }
             } else {
                 val targetTask = checkNotNull(project.tasks.findByName(taskName)) {
-                    "can not found task: ${this@ReportTaskDependencies.taskName}"
+                    "can not found task: ${this@TaskDependencies.taskName}"
                 }
                 buildGraph(targetTask)
             }

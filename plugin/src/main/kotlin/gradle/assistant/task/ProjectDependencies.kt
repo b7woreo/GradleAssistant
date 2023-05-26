@@ -7,48 +7,55 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.result.ResolvedComponentResult
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
-import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
-abstract class ReportProjectDependencies : DefaultTask() {
+abstract class ProjectDependencies : DefaultTask() {
 
     @get:Input
+    @get:Optional
     abstract val variantName: Property<String>
-
-    @get:Input
-    abstract val configurationName: Property<String>
 
     @get:Input
     @get:Optional
     abstract val type: Property<Type>
 
+    @get:OutputFile
+    abstract val dependenciesInfoFile: RegularFileProperty
+
+    @Option(
+        option = "variant",
+        description = "variant name, default: \"\""
+    )
+    fun variantName(value: String) {
+        variantName.set(value)
+    }
+
     @Option(
         option = "type",
-        description = "指定要输出依赖的类型，可选值：all、project、external，默认值：all"
+        description = "dependencies type，options：all、project、external，default：all"
     )
-    fun typeName(value: String) {
+    fun type(value: String) {
         val type = checkNotNull(Type.find(value)) { "unknown type: $value" }
         this.type.set(type)
     }
 
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
-
     @TaskAction
     fun report() {
-        val variantName = variantName.get()
-        val configurationName = this.configurationName.get()
+        val variantName = this.variantName.orNull
         val type = this.type.getOrElse(Type.All)
-        val outputFile = this.outputDir.file("${variantName}.html").get().asFile
+        val outputFile = dependenciesInfoFile.asFile.get()
 
-        val configuration = checkNotNull(project.configurations.findByName(configurationName)) {
-            "Can not found configuration: $configurationName"
-        }
+        val configurationName =
+            if (variantName == null) "runtimeClasspath" else "${variantName}RuntimeClasspath"
+        val configuration = checkNotNull(
+            project.configurations.findByName(configurationName)
+        ) { "can not found matched variant: $variantName" }
 
         val graphic = MermaidGraphic()
         graphic.render(outputFile) {
@@ -109,7 +116,6 @@ abstract class ReportProjectDependencies : DefaultTask() {
         };
 
         companion object {
-
             fun find(value: String): Type? {
                 return values().firstOrNull { value == it.value }
             }

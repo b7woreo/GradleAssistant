@@ -1,88 +1,45 @@
 package gradle.assistant
 
 import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
-import gradle.assistant.task.ReportConfigurationDependencies
-import gradle.assistant.task.ReportProjectDependencies
-import gradle.assistant.task.ReportTaskDependencies
+import gradle.assistant.task.ConfigurationDependencies
+import gradle.assistant.task.ProjectDependencies
+import gradle.assistant.task.TaskDependencies
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.configurationcache.extensions.capitalized
 
 abstract class GradleAssistant : Plugin<Project> {
+
+    override fun apply(project: Project) {
+        project.tasks.register(
+            "configurationDependencies",
+            ConfigurationDependencies::class.java
+        ) {
+            it.group = TASK_GROUP
+            it.dependenciesInfoFile.set(project.buildDir.resolve("reports/configurationDependencies.html"))
+            it.outputs.upToDateWhen { false }
+        }
+
+        project.tasks.register(
+            "projectDependencies",
+            ProjectDependencies::class.java
+        ) {
+            it.group = TASK_GROUP
+            it.dependenciesInfoFile.set(project.buildDir.resolve("reports/projectDependencies.html"))
+            it.outputs.upToDateWhen { false }
+        }
+
+        project.tasks.register(
+            "taskDependencies",
+            TaskDependencies::class.java
+        ) {
+            it.group = TASK_GROUP
+            it.dependenciesInfoFile.set(project.buildDir.resolve("reports/taskDependencies.html"))
+            it.outputs.upToDateWhen { false }
+        }
+    }
 
     companion object {
         private const val TASK_GROUP = "assistant"
     }
-
-    override fun apply(project: Project) {
-        project.plugins.all {
-            when (it) {
-                is JavaPlugin -> {
-                    project.extensions.getByType(SourceSetContainer::class.java)
-                        .configureReportDependenciesTask(project)
-                }
-
-                is AppPlugin -> {
-                    project.extensions.getByType(AndroidComponentsExtension::class.java)
-                        .configureReportDependenciesTask(project)
-                }
-
-                is LibraryPlugin -> {
-                    project.extensions.getByType(AndroidComponentsExtension::class.java)
-                        .configureReportDependenciesTask(project)
-                }
-            }
-        }
-
-        project.tasks.create(
-            "reportTaskDependencies",
-            ReportTaskDependencies::class.java
-        ) {
-            it.group = TASK_GROUP
-            it.outputDir.set(project.buildDir.resolve("reports/taskDependencies"))
-            it.outputs.upToDateWhen { false }
-        }
-
-        project.tasks.create(
-            "reportConfigurationDependencies",
-            ReportConfigurationDependencies::class.java
-        ) {
-            it.group = TASK_GROUP
-            it.outputDir.set(project.buildDir.resolve("reports/configurationDependencies"))
-            it.outputs.upToDateWhen { false }
-        }
-    }
-
-    private fun SourceSetContainer.configureReportDependenciesTask(project: Project) {
-        all { sourceSet ->
-            val taskName = sourceSet.getTaskName("report", "projectDependencies")
-            project.tasks.create(taskName, ReportProjectDependencies::class.java) {
-                it.group = TASK_GROUP
-                it.variantName.set(sourceSet.name)
-                it.configurationName.set(sourceSet.runtimeClasspathConfigurationName)
-                it.outputDir.set(project.buildDir.resolve("reports/projectDependencies"))
-                it.outputs.upToDateWhen { false }
-            }
-        }
-    }
-
-    private fun AndroidComponentsExtension<*, *, *>.configureReportDependenciesTask(project: Project) {
-        onVariants { variant ->
-            project.tasks.create(
-                "report${variant.name.capitalized()}ProjectDependencies",
-                ReportProjectDependencies::class.java
-            ) {
-                it.group = TASK_GROUP
-                it.variantName.set(variant.name)
-                it.configurationName.set(variant.runtimeConfiguration.name)
-                it.outputDir.set(project.buildDir.resolve("reports/projectDependencies"))
-                it.outputs.upToDateWhen { false }
-            }
-        }
-    }
-
 }
