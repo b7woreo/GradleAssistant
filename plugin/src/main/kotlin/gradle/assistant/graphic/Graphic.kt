@@ -25,7 +25,7 @@ class MermaidGraphic : Graphic {
         <body>
           <pre id="mermaid">$content</pre>
           <script type="module">
-            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.5.0/dist/mermaid.esm.min.mjs';
             import he from 'https://cdn.jsdelivr.net/npm/he@1.2.0/+esm';
             const { svg, _ } = await mermaid.render('mermaid', he.decode(document.getElementById('mermaid').innerHTML));
             document.body.innerHTML = svg;
